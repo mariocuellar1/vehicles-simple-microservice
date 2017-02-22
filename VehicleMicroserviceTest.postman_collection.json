@@ -1,0 +1,70 @@
+{
+	"variables": [],
+	"info": {
+		"name": "VehicleMicroserviceTest",
+		"_postman_id": "71db57c6-d5e3-9954-bb30-8775ac1b911d",
+		"description": "",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Get all vehicles",
+			"request": {
+				"url": "http://localhost:20021/vehicles",
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Basic dXNlcjE6cGFzc3dvcmQx",
+						"description": ""
+					}
+				],
+				"body": {},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Add Vehicles",
+			"request": {
+				"url": "http://localhost:20021/vehicles",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Basic dXNlcjE6cGFzc3dvcmQx",
+						"description": ""
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"plateNumber\": \"AA{{$randomInt}}\",\n  \"type\": \"Car\",\n  \"model\": \"Peugeot {{$randomInt}}\",\n  \"year\": {{$randomInt}}\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Get one vehicle",
+			"request": {
+				"url": "http://localhost:20021/vehicles/58ad696349445428e860368b",
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Basic dXNlcjE6cGFzc3dvcmQx",
+						"description": ""
+					}
+				],
+				"body": {},
+				"description": ""
+			},
+			"response": []
+		}
+	]
+}

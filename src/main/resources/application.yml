@@ -1,0 +1,29 @@
+spring:
+    application:
+        name: vehicles-microservice
+server:
+    port: 20021
+security:
+    user:
+        name: user1
+        password: password1
+        role: USER,ADMIN
+
+eureka:
+    client:
+        serviceUrl:
+            defaultZone: http://localhost:17001/eureka/,http://localhost:17002/eureka/,http://localhost:17003/eureka/
+
+---
+
+spring:
+    profiles: instance1
+server:
+    port: 20022
+
+---
+
+spring:
+    profiles: instance2
+server:
+    port: 20023
