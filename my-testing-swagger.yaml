@@ -1,0 +1,620 @@
+openapi: '3.0.0'
+info:
+  version: '1.0.0'
+  title: 'OCR and Document Classification API'
+  description: This API provides services to initiate the processing of a document (image or pdf) to classify and obtain the relevant data within it. This processing is asynchronous, so this API also provides services to check the status and the actual result after the processing. Additionally, this API provides an endpoint that allows the user to provide feedback on successful extracted data.
+
+paths:
+  /ocr_process:
+    parameters:
+      - name: Authorization
+        description: JWT Token
+        in: header
+        required: true
+        schema:
+          type: string
+    post:
+      summary: Prepare the service to receive and process a document. Provide a process ID and a secured signed URL to upload de actual file.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OcrProcessRequest'
+        required: true
+      responses:
+        '200':
+          description: All OK to provide a process ID and a secured signed URL to upload de actual file.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OcrProcessResponse'
+        400:
+          description: "Bad Request"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error400'
+        401:
+          description: "Unauthorized"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error401'
+        403:
+          description: "Forbidden"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error403'
+        404:
+          description: "Not found"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error404'
+        500:
+          description: "Internal server error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error500'
+  /ocr_process/{ocrProcessId}:
+    parameters:
+      - name: Authorization
+        description: JWT Token
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: ocrProcessId
+        description: OCR Process ID to query
+        in: path
+        required: true
+        schema:
+          type: string
+          example: c3f4b78a-55d4-11ed-bdc3-0242ac120002
+    get:
+      summary: Retreive the process information with the giving id. The result includes the operatiojn status and the result if that is already finish.
+      responses:
+        '200':
+          description: All OK to provide a process data.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OcrProcessByIdResponse'
+        400:
+          description: "Bad Request"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error400'
+        401:
+          description: "Unauthorized"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error401'
+        403:
+          description: "Forbidden"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error403'
+        404:
+          description: "Not found"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error404'
+        500:
+          description: "Internal server error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error500'
+  /ocr_process/{ocrProcessId}/download:
+    parameters:
+      - name: Authorization
+        description: JWT Token
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: ocrProcessId
+        description: OCR Process ID
+        in: path
+        required: true
+        schema:
+          type: string
+          example: c3f4b78a-55d4-11ed-bdc3-0242ac120002
+    get:
+      summary: Allows to download the original document processed. Only available when the process is complete.
+      responses:
+        '200':
+          description: All OK to provide a download url.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OcrDownloadDataResponse'
+        400:
+          description: "Bad Request"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error400'
+        401:
+          description: "Unauthorized"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error401'
+        403:
+          description: "Forbidden"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error403'
+        404:
+          description: "Not found"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error404'
+        500:
+          description: "Internal server error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error500'
+  /ocr_process/{ocrProcessId}/ocr_documents/{ocrDocumentId}:
+    parameters:
+      - name: Authorization
+        description: JWT Token
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: ocrProcessId
+        description: OCR Process ID to query.
+        in: path
+        required: true
+        schema:
+          type: string
+          example: c3f4b78a-55d4-11ed-bdc3-0242ac120002
+      - name: ocrDocumentId
+        description: OCR Document ID to query.
+        in: path
+        required: true
+        schema:
+          type: string
+          example: 9147b04c-55d6-11ed-bdc3-0242ac120002
+    get:
+      summary: Retreive the data of a single document processed.
+      responses:
+        '200':
+          description: All OK to provide the document data.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OcrProcessDocumentByIdResponse'            
+        400:
+          description: "Bad Request"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error400'
+        401:
+          description: "Unauthorized"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error401'
+        403:
+          description: "Forbidden"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error403'
+        404:
+          description: "Not found"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error404'
+        500:
+          description: "Internal server error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error500'
+  /ocr_process/{ocrProcessId}/ocr_documents/{ocrDocumentId}/download:
+    parameters:
+      - name: Authorization
+        description: JWT Token
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: ocrProcessId
+        description: OCR Process ID
+        in: path
+        required: true
+        schema:
+          type: string
+          example: c3f4b78a-55d4-11ed-bdc3-0242ac120002
+      - name: ocrDocumentId
+        description: OCR Document ID to query.
+        in: path
+        required: true
+        schema:
+          type: string
+          example: 9147b04c-55d6-11ed-bdc3-0242ac120002
+    get:
+      summary: Allows to download the document by id. The document will be a page of the original document with image file format.
+      responses:
+        '200':
+          description: All OK to provide a download url.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OcrDownloadDataResponse'
+        400:
+          description: "Bad Request"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error400'
+        401:
+          description: "Unauthorized"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error401'
+        403:
+          description: "Forbidden"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error403'
+        404:
+          description: "Not found"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error404'
+        500:
+          description: "Internal server error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error500'
+
+components:
+  schemas:
+    OcrDownloadDataResponse:
+      type: object
+      properties:
+        signedURL:
+          description: Signed URL valid for 5 minutes.
+          type: string
+          example: https://santander-document-download-ocr.amazonaws.gs.corp/d9a5b68f-679b-40f9-91cf-ab210117fb83?x-amz-meta-firebase-id&x-amz-meta-queue=DemoAppExchange&X-Amz-Security-Token=IQoJb3JpZ2luX2VjED8aCWV1LXdlc3QtMSJHMEUCICiVfNC8%2BBIg2lUCmz16dBf%2BYHRyqXbwy4QgdFgjW5vgAiEAkvsvuwGP5bQec0zHiTEy6%2FRoPHytaVkY3ExpRu30F5sq%2BAIIRxAAGgw5OTQzMTg5OTEyNjYiDGmKAIQWA1RN7pnQwirVAkJr2cbWndI87QW9WCCaHjVLoQr%2BonJ5WNG901ATKNazw8WmN%2Bwi6VriOiSqanwuwkdjKw9bCstpzfo3eSlzInjtswr3WuoTDmT53bdSFApKmruuN0zTKqeofOS2wRcC7pg1OZmTE4XznYMFpLGVp2ncuy85mlZEtyNMBDi42d1GfWZsUMI4vUzgxEXNKx64049aTUgbMYW3XdGu%2F4LXc3nJ%2FUsbegzO54fHpNkp3%2FRP%2BzCnTrvpgBYqAQhvVWNeuE4e3TT6nzVaZaG%2FH7at80Ylf3Dk%2FUIoqpeXbyjr1pwPC9mG1nxhllyxQEnoFWAGNV%2BfOqLAfbaD%2FS1KTaPleBygKuGqAxKLtiAZKljyQ2bFBW%2FT6mbM1Z7QBFaDOk3cJNy3cWqJwLAcFRn0jvf5jiCg3In2gvmdaGNtRC%2Br%2B3%2B6k9awG%2Bpfq%2BPQs8wKLR93RRePKw9fMNip3psGOp4BsMa0wSMLlwGKGpG%2B1bI3gyc2Zu1nCqU57Mttul%2FYJbV7rR8xeuVXLBjQJkxAdsOk9oFiAXPoyIbG0aSey8GAd%2BYd0XfOL5fqfLsncTuikGGhj9YDxVK9H4fGVx2ZtTbZXS%2BngXeM%2F%2B3hHndmhfBV%2FE8KAHEEaXJk1907%2Fdd%2Bp4iJaldW4q2w7Tiz5upPuiCJNsLY%2BaezgtnGvhEk6Xs%3D&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20221118T142124Z&X-Amz-SignedHeaders=host&X-Amz-Expires=600&X-Amz-Credential=ASIA6PAQHX6RKJNSGI7Y%2F20221118%2Feu-west-1%2Fs3%2Faws4_request&X-Amz-Signature=759df596efe98ae90c44c66010bd4be175b6cfc128295346798f18c625452f21
+    OcrProcessRequest:
+      type: object
+      properties:
+        documentType:
+          description: Force to process the document as the type indicated.
+          type: string
+          example: CARD_ID
+        additionalInfo:
+          description: Information related to the process that will be created.
+          type: object
+          properties:
+            requesterApplication:
+              description: Id of the calling Application.
+              type: string
+              example: DEALER_PLATFORM
+            deviceId:
+              description: Id of the calling device. Could be used to deliver a notification of the completition.
+              type: string
+              example: 622d6f4c-4a3f-11ed-b878-0242ac120002
+            resultExchangeName:
+              description: Exchange name used to notify task completion. Empty to used the defaut one. The System will add a prefix to the Exchange name. ("ocr_result").
+              type: string
+              example: PoS-Exchange
+    OcrProcessByIdResponse:
+      type: object
+      properties:
+        processId:
+          description: OCR Process ID.
+          type: string
+          example: 6b62f07a-6018-11ed-9b6a-0242ac120002
+        processStatus:
+          description: |
+            Current status of the OCR process:
+            NOT_STARTED
+            Process status "Not Started" means that there is a process request but no file has been uploaded yet..
+            IN_PROGRESS
+            Process Status "In Progress" shows that the assigned resource is being working on this task now.
+            DEFERRED (not implemented)
+            Process Status "Deferred" shows that the task was put on hold and cannot be completed at the moment.
+            COMPLETED
+            Process Status "Completed" shows that the all images/pages has been successfully done and full data and extracted and classification can be read.
+            COMPLETED_WITH_ERROR
+            Some documents could has failed
+          type: string
+          enum:
+            - NOT_STARTED
+            - IN_PROGRESS
+            - DEFERRED
+            - COMPLETED
+            - COMPLETE_WITH_ERROR
+          example: COMPLETE
+        documents:
+          type: array
+          items:
+            $ref: '#/components/schemas/OcrProcessDocument'
+        processError:
+            $ref: '#/components/schemas/ProcessError'
+    OcrProcessDocument:
+      type: object
+      properties:
+        documentId:
+          description: Id of the document generated.
+          type: string
+          example: 9147b04c-55d6-11ed-bdc3-0242ac120002
+        documentStatus:
+          description: |
+            NOT_STARTED
+            Process status "Not Started" means that the document has been identified but the processing has not started yet.
+            IN_PROGRESS
+            Process Status "In Progress" shows that the document is being processing.
+            COMPLETED
+            Process Status "Completed" shows that the image/page has been successfully processed and the result are ready.
+          type: string
+          example: 9147b04c-55d6-11ed-bdc3-0242ac120002
+        classification:
+          $ref: '#/components/schemas/DocumentClassification'
+        documentLocationPage:
+          description: Reference to the page number in the original PDF. If document is a image, always return 1. ONLY available when extended option enabled.
+          type: number
+          example: 1
+        documentData:
+          type: array
+          items:
+            $ref: '#/components/schemas/OCRDocumentData'
+        documentError:
+            $ref: '#/components/schemas/DocumentError'
+    OCRDocumentData:
+      description: |
+        List of object that contains the data extracted in the OCR process. The fields in the data depends on the Type of the document (documentType). Only available when status is COMPLETE. ONLY available when extended option enabled.
+        Please check the documentation for the full list of Fields by type. https://confluence.alm.europe.cloudcenter.corp/pages/viewpage.action?pageId=210816453
+      type: object
+      properties:
+        fieldName:
+          description: Field name.
+          type: string
+          example: FirstName
+        value:
+          description:  Value
+          type: string
+          example: ANNA
+        confidence:
+          description: Confidence level expressed in percentage %. ONLY available when extended option enabled.
+          type: number
+          example: 91.16
+        boundingBox:
+          $ref: '#/components/schemas/BoundingBox'
+    BoundingBox:
+      description: |
+        The bounding box around the detected page, text, key-value pair, table, table cell, or selection element on a document page.
+      type: object
+      properties:
+        height:
+          description: The height of the bounding box as a ratio of the overall document page height.
+          type: number
+          example: 0.6226779818534851
+        left:
+          description:  The left coordinate of the bounding box as a ratio of overall document page width.
+          type: number
+          example: 0.5970442891120911
+        top:
+          description: The top coordinate of the bounding box as a ratio of overall document page height.
+          type: number
+          example: 0.05160708352923393
+        width:
+          description: The width of the bounding box as a ratio of the overall document page width.
+          type: number
+          example: 0.06297368556261063
+    DocumentClassification:
+      type: object
+      properties:
+        documentType:
+          description: |
+            Classification of the document, available optionally only when process is complete.
+            Valid Types: https://confluence.alm.europe.cloudcenter.corp/display/OCRDC/Document+Classification
+          type: string
+          example: CARD_ID
+        documentSubtype:
+          description:  |
+            Subclassification of the document, available optionally only when process is complete. No all types have subtypes, so this field could be empty.
+            Valid Subtypes: https://confluence.alm.europe.cloudcenter.corp/display/OCRDC/Document+Classification
+          type: string
+          example: DE_CARD_ID
+        confidence:
+          description: Document Classification's confidence level expressed in percentage %. ONLY available when extended option enabled.
+          type: number
+          example: 95.22
+    DocumentError:
+      description: Only appears when there is a problem detected during the page processing. 
+      type: object
+      properties:
+        code:
+          description: code of the error when something went wrong during the processing of the page.
+          type: string
+          example: OCR-001
+        description:
+          description: Description of the error when something went wrong during the processing of the page.
+          type: string
+          example: duplicated information detected in the page.
+    ProcessError:
+      description: Only appears when there is a problem detected during the document process.
+      type: object
+      properties:
+        code:
+          description: code of the error when something went wrong during the document processing.
+          type: string
+          example: OCR-002
+        description:
+          description: Description of the error when something went wrong during the document processing.
+          type: string
+          example: invalid document format
+    OcrProcessDocumentByIdResponse:
+      type: object
+      properties:
+        documentId:
+          description: Id of the document generated.
+          type: string
+          example: 9147b04c-55d6-11ed-bdc3-0242ac120002
+        documentStatus:
+          description: |
+            NOT_STARTED
+            Process status "Not Started" means that the document has been identified but the processing has not started yet.
+            IN_PROGRESS
+            Process Status "In Progress" shows that the document is being processing.
+            COMPLETED
+            Process Status "Completed" shows that the image/page has been successfully processed and the result are ready.
+          type: string
+          example: 9147b04c-55d6-11ed-bdc3-0242ac120002
+        classification:
+          $ref: '#/components/schemas/DocumentClassification'
+        documentLocationPage:
+          description: Reference to the page number in the original PDF. If document is a image, always return 1. ONLY available when extended option enabled.
+          type: number
+          example: 1
+        documentData:
+          type: array
+          items:
+            $ref: '#/components/schemas/OCRDocumentData'
+        documentError:
+          $ref: '#/components/schemas/DocumentError'       
+    OcrProcessResponse:
+      type: object
+      properties:
+        uploadUrl:
+          description: Signed URL to upload the document which will be procesed by the service.
+          type: string
+        processId:
+          description: New Process Id Generated
+          type: string
+    Error400:
+      properties:
+        httpCode:
+          type: "string"
+          description: "Requests return code"
+          example: "400"
+        httpMessage:
+          type: "string"
+          description: "Requests return message"
+          example: "Bad Request"
+        moreInformation:
+          type: "string"
+          description: "Additional information of the error"
+          example: "The server cannot or will not process the request due to something\
+              \ that is perceived to be a client error."
+      additionalProperties: false
+      required:
+        - "httpCode"
+        - "httpMessage"
+        - "moreInformation"
+    Error401:
+      properties:
+        httpCode:
+          type: "string"
+          description: "Requests return code"
+          example: "401"
+        httpMessage:
+          type: "string"
+          description: "Requests return message"
+          example: "Unauthorized"
+        moreInformation:
+          type: "string"
+          description: "Additional information of the error"
+          example: "Although the HTTP standard specifies \"unauthorized\", semantically\
+            \ this response means \"unauthenticated\". That is, the client must authenticate\
+            \ itself to get the requested response."
+      additionalProperties: false
+      required:
+        - "httpCode"
+        - "httpMessage"
+        - "moreInformation"
+    Error403:
+      properties:
+        httpCode:
+          type: "string"
+          description: "Requests return code"
+          example: "403"
+        httpMessage:
+          type: "string"
+          description: "Requests return message"
+          example: "Forbidden"
+        moreInformation:
+          type: "string"
+          description: "Additional information of the error"
+          example: "The client does not have access rights to the content; that is,\
+            \ it is unauthorized, so the server is refusing to give the requested resource.\
+            \ Unlike 401 Unauthorized, the client's identity is known to the server."
+      additionalProperties: false
+      required:
+        - "httpCode"
+        - "httpMessage"
+        - "moreInformation"
+    Error404:
+      properties:
+        httpCode:
+          type: "string"
+          description: "Requests return code"
+          example: "404"
+        httpMessag:
+          type: "string"
+          description: "Requests return message"
+          example: "Not Found"
+        moreInformation:
+          type: "string"
+          description: "Additional information of the error"
+          example: "The server can not find the requested resource. In the browser,\
+            \ this means the URL is not recognized. In an API, this can also mean that\
+            \ the endpoint is valid but the resource itself does not exist. Servers\
+            \ may also send this response instead of 403 Forbidden to hide the existence\
+            \ of a resource from an unauthorized client. This response code is probably\
+            \ the most well known due to its frequent occurrence on the web."
+      additionalProperties: false
+      required:
+        - "httpCode"
+        - "httpMessag"
+        - "moreInformation"
+    Error500:
+      properties:
+        httpCode:
+          type: "string"
+          description: "Requests return code"
+          example: "500"
+        httpMessage:
+          type: "string"
+          description: "Requests return message"
+          example: "Conflict"
+        moreInformation:
+          type: "string"
+          description: "Additional information of the error"
+          example: "The server has encountered a situation it does not know how to handle."
+      additionalProperties: false
+      required:
+        - "httpCode"
+        - "httpMessage"
+        - "moreInformation"
+  securitySchemes:
+    clientIdHeader:
+      type: apiKey
+      name: api_key
+      in: header
+security:
+  - clientIdHeader: []
